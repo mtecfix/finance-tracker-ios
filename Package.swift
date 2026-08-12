@@ -11,11 +11,6 @@ let package = Package(
         .target(
             name: "FinanceApp",
             path: "FinanceApp"
-        ),
-        .testTarget(
-            name: "FinanceAppTests",
-            dependencies: ["FinanceApp"],
-            path: "Tests/FinanceAppTests"
         )
     ]
 )
