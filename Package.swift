@@ -1,0 +1,11 @@
+// swift-tools-version: 5.9
+import PackageDescription
+let package = Package(
+    name: "FinanceApp",
+    platforms: [.iOS(.v16)],
+    products: [.library(name: "FinanceApp", targets: ["FinanceApp"])],
+    targets: [
+        .target(name: "FinanceApp", dependencies: []),
+        .testTarget(name: "FinanceAppTests", dependencies: ["FinanceApp"])
+    ]
+)
