@@ -1,13 +1,22 @@
 # Finance Tracker iOS
+> Personal finance app built for irregular income earners — freelancers, gig workers, contractors, and RSU recipients.
 
-Personal finance app built for irregular income earners — freelancers, gig workers, and RSU recipients.
+[![Build](https://github.com/mtecfix/finance-tracker-ios/actions/workflows/build.yml/badge.svg)](https://github.com/mtecfix/finance-tracker-ios/actions)
+![Swift](https://img.shields.io/badge/Swift-5.9-orange)
+![iOS](https://img.shields.io/badge/iOS-16%2B-blue)
+
+---
 
 ## Features
-- **Sinking Fund Engine** — allocate lump-sum payouts into future spending vaults
-- **Tax Withholding** — auto-calculates 25% tax reserve on every income entry
-- **Income Vault** — lock away money for dry spells
-- **RSU Tracker** — track equity vesting schedules
-- **Transaction Log** — full history with category and date
+- **Sinking Fund Engine** — allocate lump-sum payouts into named spending vaults
+- **25% Tax Withholding** — auto-calculated on every income entry, shown separately
+- **Income Vault** — lock money away for dry-spell months
+- **Tax Reserve** — dedicated vault auto-tracked against withholding
+- **RSU Tracker** — vault for equity compensation
+- **Charts & Analysis** — income by month, expense by category, net position
+- **Transaction History** — full log with income/expense/allocation types
+- **Offline Mode** — all data cached locally, syncs when back online
+- **Full Auth Flow** — sign up, email verification, forgot password, sign in
 
 ## AWS Backend
 | Resource | Value |
@@ -23,48 +32,64 @@ Personal finance app built for irregular income earners — freelancers, gig wor
 ## API Routes
 | Method | Route | Description |
 |--------|-------|-------------|
-| GET | `/accounts` | List all vaults/accounts |
-| POST | `/accounts` | Create a new vault |
+| GET | `/accounts` | List all vaults |
+| POST | `/accounts` | Create vault |
+| PUT | `/accounts/{id}` | Update vault balance/name |
+| DELETE | `/accounts/{id}` | Delete vault |
 | GET | `/transactions` | List all transactions |
-| POST | `/transactions` | Log income or expense (auto-calculates tax) |
+| POST | `/transactions` | Log income/expense (auto-calculates tax) |
+| DELETE | `/transactions/{id}` | Delete transaction |
 
 ## Project Structure
 ```
 FinanceApp/
-├── Config.swift                  — API endpoints, Cognito IDs
-├── FinanceApp.swift              — App entry point
+├── Assets.xcassets/              ← App icon (placeholder — replace AppIcon-1024.png)
+├── Config.swift
+├── FinanceApp.swift              ← App entry + launch screen animation
 ├── Models/
-│   ├── Account.swift             — Account/vault model + AccountType enum
-│   └── Transaction.swift         — Transaction model + TransactionType enum
+│   ├── Account.swift             ← AccountType: sinking_fund | income_vault | tax_reserve | rsu_tracker
+│   └── Transaction.swift         ← TransactionType: income | expense | allocation
 ├── Services/
-│   └── APIService.swift          — All HTTP calls
+│   ├── APIService.swift
+│   ├── AuthService.swift
+│   ├── LocalCache.swift
+│   ├── NotificationManager.swift
+│   └── OfflineBanner.swift
 ├── ViewModels/
-│   └── AccountsViewModel.swift   — Accounts + transactions state
+│   └── AccountsViewModel.swift   ← Full CRUD + balance auto-update + offline cache
 └── Views/
-    ├── ContentView.swift         — Auth gate + tab navigation
-    ├── DashboardView.swift       — Balance overview + recent activity
-    ├── AccountsView.swift        — Vault list
-    ├── AddAccountView.swift      — Create vault form
-    ├── TransactionsView.swift    — Transaction history
-    ├── LogIncomeView.swift       — Log income with tax calc
-    ├── LoginView.swift           — Sign in
-    ├── SignUpView.swift          — Create account
-    ├── ConfirmEmailView.swift    — Email verification
-    └── ForgotPasswordView.swift  — Password reset
+    ├── LaunchScreenView.swift    ← Deep green gradient + chart icon
+    ├── ContentView.swift         ← 4 tabs: Dashboard, Vaults, Income, Charts
+    ├── LoginView.swift
+    ├── SignUpView.swift
+    ├── ConfirmEmailView.swift
+    ├── ForgotPasswordView.swift
+    ├── DashboardView.swift       ← Balance summary, tax reserve, recent transactions
+    ├── AccountsView.swift        ← Vault list with progress bars
+    ├── AccountDetailView.swift   ← Vault transactions + log income button
+    ├── AddAccountView.swift
+    ← EditAccountView.swift
+    ├── TransactionsView.swift    ← Full transaction history
+    ├── LogIncomeView.swift       ← Log income or expense + tax calc
+    └── FinanceChartsView.swift   ← Income bars, expense categories, net position
 ```
 
-## Getting Started
-1. Open `Package.swift` in Xcode 15+
-2. Build and run on iOS 16+ simulator or device
-3. Sign in or create an account
-4. Add your first vault and log income
-
 ## Tax Withholding Logic
-Every income entry automatically calculates 25% for self-employment tax and displays it separately, helping you never be caught short at tax time.
+Every income entry automatically sets aside 25% for self-employment tax:
+- Shown separately in transaction log
+- Tracked in dedicated Tax Reserve vault
+- Visible on dashboard at all times
 
-## CI/CD
-GitHub Actions builds automatically on every push to `main` using macOS runner.
+## App Icon
+Placeholder: `FinanceApp/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png` (solid green).
+Replace with your 1024×1024 PNG.
+
+## Launch Screen
+Deep green gradient with chart icon, fades out after 1.8s.
 
 ## Installing via AltStore
-1. Download the `.ipa` from the latest GitHub Actions build artifact
-2. Open AltStore on your iPhone → tap `+` → select the `.ipa`
+1. Download `.ipa` from GitHub Actions build artifacts
+2. Open AltStore → tap `+` → select `.ipa`
+
+## CI/CD
+GitHub Actions builds on every push to `main` using macOS runner.
